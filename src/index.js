@@ -24,6 +24,9 @@ function expressionCalculator(expr) {
     } else if (stringFromExpr.indexOf('*') === 1) {
         operation = 'multiplication';
         arguments = stringFromExpr.split('*');
+    } else if (stringFromExpr.indexOf('/') === 1) {
+        operation = 'division';
+        arguments = stringFromExpr.split('/');
     }
     leftArg = Number(arguments[0]);
     rightArg = Number(arguments[1]);
@@ -39,6 +42,9 @@ function expressionCalculator(expr) {
         case 'multiplication':
             result = multiplication(leftArg,rightArg);
             break;
+        case 'division':
+            result = division(leftArg,rightArg);
+            break;
     }
 
     function addition(a,b) {
@@ -49,6 +55,9 @@ function expressionCalculator(expr) {
     }
     function multiplication(a,b) {
         return a * b;
+    }
+    function division(a,b) {
+        return a / b;
     }
     return result;
     }
