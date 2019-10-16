@@ -177,7 +177,7 @@ function expressionCalculator(expr) {
 
         string = string.replace(leftNumberInString, result);
         string = string.replace(rightNumberInString, '');
-        string = string.replace(/\-/m , ''); 
+        string = string.replace(/\-*$/m , ''); 
         return string;
     }
     //---------------------------------------------------------------------------
@@ -205,25 +205,25 @@ function expressionCalculator(expr) {
             
             if (symbol === '*') {
                 changedStringFromExpr = getLeftandRightPartOfExpressionByMultiplicants (stringFromExpr);
-                leftNumber = getLeftNumber(changedStringFromExpr); // 62
-                rightNumber = getRightNumber(changedStringFromExpr); // 33
-                result = multiplication(leftNumber,rightNumber); // 1.878787878787879
-                stringFromExpr = deleteElementsFromStringMultiplicants(stringFromExpr, leftNumber, rightNumber, result); // 84+1.878787878787879*10+15
+                leftNumber = getLeftNumber(changedStringFromExpr);
+                rightNumber = getRightNumber(changedStringFromExpr);
+                result = multiplication(leftNumber,rightNumber);
+                stringFromExpr = deleteElementsFromStringMultiplicants(stringFromExpr, leftNumber, rightNumber, result);
             } 
         }
         return stringFromExpr;
     }
 
     function checkStringAddition(stringFromExpr) {
-        for (let i = 0; i < stringFromExpr.length; i++) { //цикл проверки элементов строки на знак /
+        for (let i = 0; i < stringFromExpr.length; i++) {
             let symbol = stringFromExpr[i];
             
             if (symbol === '+') {
                 changedStringFromExpr = getLeftandRightPartOfExpressionByAddition(stringFromExpr);
-                leftNumber = getLeftNumber(changedStringFromExpr); // 62
-                rightNumber = getRightNumber(changedStringFromExpr); // 33
+                leftNumber = getLeftNumber(changedStringFromExpr);
+                rightNumber = getRightNumber(changedStringFromExpr);
                 result = addition(leftNumber,rightNumber);
-                stringFromExpr = deleteElementsFromStringAddition(stringFromExpr, leftNumber, rightNumber, result); // 84+1.878787878787879*10+15
+                stringFromExpr = deleteElementsFromStringAddition(stringFromExpr, leftNumber, rightNumber, result);
             } 
         }
         return stringFromExpr;
@@ -250,6 +250,3 @@ function expressionCalculator(expr) {
 module.exports = {
     expressionCalculator
 }
-//Fot quokka (test)
-//let expression = " 64 + 19 - 77 - 93 ";
-//expressionCalculator(expression);
