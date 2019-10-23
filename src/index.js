@@ -4,248 +4,69 @@ function eval() {
 }
 
 function expressionCalculator(expr) {
-    return getExpressionFromBrackets(expr);
-    
-    function getExpressionFromBrackets(expr){
-    let stringFromExpr = '';
-    let result;
-    
-    let divis = null;
-    let multi = null;
-    let plus = null;
-    let minus = null;
 
-    stringFromExpr = deleteSpaces(expr);
-
-    divis = getCountDivision(stringFromExpr);
-    multi = getCountMultiplication(stringFromExpr);
-    plus = getCountPlus(stringFromExpr);
-    minus = getCountMinus(stringFromExpr);
-
-    for(let i=0; i < divis; i++){
-        stringFromExpr = checkStringDevision(stringFromExpr);
-        divis--;
+    stringFromExpr = expr.replace(/\s+/g, '');
+  
+    function getExprFromBrackets(string) {
+  
+      let leftBracket = string.lastIndexOf('(');
+      let rightBracket = string.indexOf(')', leftBracket);
+  
+      if ( (rightBracket != -1 && leftBracket === -1) || (rightBracket === -1 && leftBracket != -1) ) {
+        throw 'ExpressionError: Brackets must be paired';
+      }
+  
+      let currentBracket = addition(string.substring(leftBracket + 1, rightBracket));
+      currentBracket = ( currentBracket.toString() ).replace('-', 'tempMinus');
+  
+      let result = string.substring(0, leftBracket) + currentBracket + string.substring(rightBracket + 1);
+      return result;
     }
-
-    for(let i=0; i < multi; i++){
-        stringFromExpr = checkStringMultiply(stringFromExpr);
-        multi--;
+  
+    function addition(string) {
+  
+      let currentArray = string.split('+');
+      currentArray = currentArray.map(substract);
+      return currentArray.reduce( (a,b) =>  { return a + b } );
     }
-
-    for(let i=0; i < plus; i++){
-        stringFromExpr = checkStringAddition(stringFromExpr);
-        plus--;
+  
+    function substract(string) {
+  
+      let currentArray = string.split('-');
+      currentArray = currentArray.map(multiply);
+      return currentArray.reduce( (a,b) => { return a - b} );
     }
-
-    for(let i=0; i < minus; i++){
-        stringFromExpr = checkStringSubstraction(stringFromExpr);
-        minus--;
-    }
-
-    stringFromExpr = Number(stringFromExpr);
-    stringFromExpr = stringFromExpr.toFixed(4);
-    result = Number(stringFromExpr);
-
-    //-------------------------------------------------------------------------
-    //---Функции для подсчета:
-    function addition(a,b) {
-        return a + b;
-    }
-    function subtraction(a,b) {
-        return a - b;
-    }
-    function multiplication(a,b) {
-        return a * b;
-    }
-    function division(a,b) {
-        if (b !== 0 ) {
-            return a / b;
+  
+    function divide(string) {
+  
+      let currentArray = string.split('/');
+      currentArray = currentArray.map((currentNumber) => {
+        currentNumber = currentNumber.replace('tempMinus','-')
+        return Number(currentNumber);
+      });
+  
+      return currentArray.reduce( (a,b) => {
+        if (b === 0) {
+          throw 'TypeError: Division by zero.';
         } else {
-            throw new Error("TypeError: Division by zero.") ;
+          return a / b;
         }
+      });
     }
-    //---------------------------------------------------------------------------
-    //---Функции получения количества знаков в выражении:
-    function getCountDivision(string) {
-        count = 0;
-        pos = string.indexOf('/');
-        while ( pos != -1 ) {
-            count++;
-            pos = string.indexOf('/',pos+1);
-        }
-        return count;
-    }
-    function getCountMultiplication(string) {
-        count = 0;
-        pos = string.indexOf('*');
-        while ( pos != -1 ) {
-            count++;
-            pos = string.indexOf('*',pos+1);
-        }
-        return count;
-    }
-    function getCountPlus(string) {
-        count = 0;
-        pos = string.indexOf('+');
-        while ( pos != -1 ) {
-            count++;
-            pos = string.indexOf('+',pos+1);
-        }
-        return count;
-    }
-    function getCountMinus(string) {
-        count = 0;
-        pos = string.indexOf('-');
-        while ( pos != -1 ) {
-            count++;
-            pos = string.indexOf('-',pos+1);
-        }
-        return count;
-    }
-    //---------------------------------------------------------------------------
-
-    //---Функции для поиска символа и действий с соседними элементами:
-    function deleteSpaces(string) {
-        return string.replace(/\s+/g, '');
-    }
-
-    function getLeftandRightPartOfExpressionByDevision(string) {
-        return string.split('/');
-    }
-    function getLeftandRightPartOfExpressionByMultiplicants(string) {
-        return string.split('*');
-    }
-    function getLeftandRightPartOfExpressionByAddition(string) {
-        return string.split('+');
-    }
-    function getLeftandRightPartOfExpressionBySubstraction(string) {
-        return string.split('-');
-    }
-
-    function getLeftNumber(string) {
-        let leftElement = string[0]; 
-        leftElement = leftElement.match(/-?\d+\.*\d*$/m);
-        let number = Number(leftElement[0]);
-        return number;
+  
+    function multiply(string) {
+  
+      let currentArray = string.split('*');
+      currentArray = currentArray.map(divide);
+      return currentArray.reduce( (a,b) => { return a * b} );
     }
     
-    function getRightNumber(string) {
-    let rightElement = string[1];
-    if (rightElement.length === null) {
-        return string;
+    while ((stringFromExpr.indexOf('(') != -1) || (stringFromExpr.indexOf(')') != -1)) {
+        stringFromExpr = getExprFromBrackets(stringFromExpr);
     }
-    rightElement = rightElement.match(/-?\d+\.*\d*/m);
-    rightElement[0];
-    let number = Number(rightElement[0]);
-
-        return number;
-    }
-
-    function deleteElementsFromStringDevision(string, leftNumber, rightNumber, result ) {
-        leftNumberInString = String(leftNumber);
-        rightNumberInString = String(rightNumber);
-
-        string = string.replace(rightNumberInString, '');
-        string = string.replace(leftNumberInString, result);
-        string = string.replace(/\//m , '');
-
-        return string;
-    }
-
-    function deleteElementsFromStringMultiplicants(string, leftNumber, rightNumber, result ) {
-        leftNumberInString = String(leftNumber);
-        rightNumberInString = String(rightNumber);
-
-        string = string.replace(rightNumberInString, ''); 
-        string = string.replace(leftNumberInString, result); 
-        string = string.replace(/\*/m , '');
-        return string;
-    }
-
-    function deleteElementsFromStringAddition(string, leftNumber, rightNumber, result ) {
-        leftNumberInString = String(leftNumber);
-        rightNumberInString = String(rightNumber);
-
-        string = string.replace(rightNumberInString, '');
-        string = string.replace(leftNumberInString, result);
-        string = string.replace(/\+/m , '');
-        return string;
-    }
-    function deleteElementsFromStringSubtraction(string, leftNumber, rightNumber, result ) {
-        leftNumberInString = String(leftNumber);
-        rightNumberInString = String(rightNumber);
-
-        string = string.replace(leftNumberInString, result);
-        string = string.replace(rightNumberInString, '');
-        string = string.replace(/\-*$/m , ''); 
-        return string;
-    }
-    //---------------------------------------------------------------------------
-    
-    //---Функции для проверки элементов строки на знаки:
-
-    function checkStringDevision(stringFromExpr) {
-        for (let i = 0; i < stringFromExpr.length; i++) {
-            let symbol = stringFromExpr[i];
-    
-            if (symbol === '/') {
-                changedStringFromExpr = getLeftandRightPartOfExpressionByDevision(stringFromExpr);
-                leftNumber = getLeftNumber(changedStringFromExpr);
-                rightNumber = getRightNumber(changedStringFromExpr);
-                result = division(leftNumber,rightNumber);
-                stringFromExpr = deleteElementsFromStringDevision(stringFromExpr, leftNumber, rightNumber, result); 
-            } 
-        }
-        return stringFromExpr;
-    }
-
-    function checkStringMultiply(stringFromExpr) {
-        for (let i = 0; i < stringFromExpr.length; i++) { 
-            let symbol = stringFromExpr[i];
-            
-            if (symbol === '*') {
-                changedStringFromExpr = getLeftandRightPartOfExpressionByMultiplicants (stringFromExpr);
-                leftNumber = getLeftNumber(changedStringFromExpr);
-                rightNumber = getRightNumber(changedStringFromExpr);
-                result = multiplication(leftNumber,rightNumber);
-                stringFromExpr = deleteElementsFromStringMultiplicants(stringFromExpr, leftNumber, rightNumber, result);
-            } 
-        }
-        return stringFromExpr;
-    }
-
-    function checkStringAddition(stringFromExpr) {
-        for (let i = 0; i < stringFromExpr.length; i++) {
-            let symbol = stringFromExpr[i];
-            
-            if (symbol === '+') {
-                changedStringFromExpr = getLeftandRightPartOfExpressionByAddition(stringFromExpr);
-                leftNumber = getLeftNumber(changedStringFromExpr);
-                rightNumber = getRightNumber(changedStringFromExpr);
-                result = addition(leftNumber,rightNumber);
-                stringFromExpr = deleteElementsFromStringAddition(stringFromExpr, leftNumber, rightNumber, result);
-            } 
-        }
-        return stringFromExpr;
-    }
-    function checkStringSubstraction(stringFromExpr) {
-        for (let i = 0; i < stringFromExpr.length; i++) {
-            let symbol = stringFromExpr[i];
-
-            if (symbol === '-') {
-                changedStringFromExpr = getLeftandRightPartOfExpressionBySubstraction(stringFromExpr);
-                leftNumber = getLeftNumber(changedStringFromExpr);
-                rightNumber = getRightNumber(changedStringFromExpr);
-                result = subtraction(leftNumber,rightNumber);
-                stringFromExpr = deleteElementsFromStringSubtraction(stringFromExpr, leftNumber, rightNumber, result);
-
-            } 
-        }
-        return stringFromExpr;
-    }
-    return result;
-    }
-}
+  
+    return (addition(stringFromExpr));
+  }
 
 module.exports = {
     expressionCalculator
